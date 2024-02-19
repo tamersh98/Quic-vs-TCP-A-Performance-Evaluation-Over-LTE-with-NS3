@@ -32,4 +32,19 @@ as we see , our results getting close to article results for the distance , we c
 getting down.
 
 still trying to add packet lose probability as the article said.
+16/2 
+tried to install quic protocol from ns-3 appstore , but failed with building , im using ns3.40
+i did what the ReadMe instruction told , but still didn't success to build it.
+the error i keep getting undefind refernce to Quic files , or QuicHelper::install(..) not not found
+
+17/2
+i searched the internet about a solution and i found google groups for ns3 , they was talking about that problem from previous topics 
+one solution was to install ns3.29 , i installed it and still didnt build
+other solution said i should install ns3.32 and i did thats but still same problem
+
+18/2 
+i found a github link givig instruction how to install quic to ns3 , https://github.com/signetlabdei/quic
+they asked for ns3.7 i installed it and went on instructions step by step and still didnt work got build errors 
+i tried to install quic from another source called proto-quic but the problem was it needed something different with ns3
+like another built in fuctions and compilers and didnt continue with installing.
 
