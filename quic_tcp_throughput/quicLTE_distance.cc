@@ -225,7 +225,7 @@ int main (int argc, char *argv[])
         totalThroughput += i->second.rxBytes * 8.0 / 10.0 / 1000 / 1000; // Convert bytes to Mbps
     }
     double avgThroughput = totalThroughput / stats.size();
-    std::cout << "Average TCP throughput: " << avgThroughput << " Mbps" << std::endl;
+    std::cout << "Average Quic throughput: " << avgThroughput << " Mbps" << std::endl;
      /* uint64_t rxBytes = 0;
 
       rxBytes = packet_size * DynamicCast<QuicServer> (serverApps.Get (0))->GetReceived ();
