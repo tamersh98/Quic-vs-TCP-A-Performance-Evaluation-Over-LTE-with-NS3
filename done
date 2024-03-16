@@ -54,3 +54,23 @@ and we had to install quiche library and changing some files and correcting some
 we can find quic folder in another library we should download quic-on-ns3-main 
 and then do the ReadMe steps we have succussfuly run the first quic example , the quic code can be found in quic-first-example file 
 
+25/2
+
+we tried to work with quichie library and we found out that it doesnt contain the bulksendhelper for quic , so we had to make it from zero
+but we failed trying.
+
+27/2 
+installed again quic from git , quic similar to quic module for ns3 , i had to install ns3.37 for this version of quic module,
+and i successfully installed it and tested it for the first time.
+
+5/3 
+
+for past 2 days we been trying to get the same articale value for the simualtion , for ecample the fading , pathloss , maxbuffersize.
+but we couldnt get to the same parameters they used in the simulation , and everytime i try to change the fading for example , i get 
+constant throughput when i try to change distance , so after disccussion with eran we decided not to use them.
+
+13/3
+
+we had compared tcp and quic for the first scenario , and results can be found in quic_tcp_throughput folder.
+
+
