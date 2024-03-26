@@ -29,6 +29,14 @@
 #include "ns3/mobility-module.h"
 #include "ns3/quic-module.h"
 #include "ns3/error-model.h"
+#include "ns3/propagation-delay-model.h"
+#include "ns3/propagation-loss-model.h"
+#include "ns3/simulator.h"
+#include "ns3/yans-wifi-helper.h"
+#include "ns3/wifi-psdu.h"
+#include "ns3/yans-wifi-channel.h"
+#include "ns3/yans-wifi-phy.h"
+#include "ns3/nist-error-rate-model.h"
 using namespace ns3;
 
 //static uint64_t rxBytes = 0;
@@ -65,14 +73,15 @@ int main (int argc, char *argv[])
   //Config::SetDefault ("ns3::LteEnbPhy::TxPower", DoubleValue (46.0));
  // Config::SetDefault ("ns3::LteUePhy::TxPower", DoubleValue (23.0));
 
-  Config::SetDefault ("ns3::LteEnbNetDevice::DlBandwidth", UintegerValue(100));
-  Config::SetDefault ("ns3::LteEnbNetDevice::UlBandwidth", UintegerValue(100));
+ // Config::SetDefault ("ns3::LteEnbNetDevice::DlBandwidth", UintegerValue(100));
+ // Config::SetDefault ("ns3::LteEnbNetDevice::UlBandwidth", UintegerValue(100));
 
   
    Ptr<RateErrorModel> em = CreateObject<RateErrorModel>();
    em->SetAttribute("ErrorRate", DoubleValue(0.005));
    em->SetAttribute("ErrorUnit", StringValue("ERROR_UNIT_PACKET")); 
-   
+  //delcare propagation loss model
+
 
   // Create a single RemoteHost
   NodeContainer remoteHostContainer;
@@ -90,12 +99,14 @@ int main (int argc, char *argv[])
   std::cout << "Id of pgw node: " << pgw->GetId() << std::endl;
   std::cout << "Id of sgw node: " << sgw->GetId() << std::endl;
 
+
   // Create the Internet
   PointToPointHelper p2ph;
   p2ph.SetDeviceAttribute ("DataRate", DataRateValue (internet_bandwidth));
   p2ph.SetChannelAttribute ("Delay", TimeValue (internet_delay));
  // p2ph.SetDeviceAttribute ("ReceiveErrorModel", PointerValue (&error_model));
   NetDeviceContainer internetDevices = p2ph.Install (pgw, remoteHost);
+  
   //internetDevices.Get(1)->SetAttribute("ReceiveErrorModel", PointerValue(em));
 
     internetDevices.Get(0)->SetAttribute("ReceiveErrorModel", PointerValue(em));
@@ -145,9 +156,16 @@ int main (int argc, char *argv[])
 	mobility.SetPositionAllocator (positionAlloc);
 	mobility.Install (allNodes);
 
-  GetPositionRaw(ueNodes.Get(0));
   
-   // lteHelper->SetPathlossModelAttribute("Exponent0" ,DoubleValue(1.2));
+ GetPositionRaw(ueNodes.Get(0));
+
+    lteHelper->SetPathlossModelType(TypeId::LookupByName("ns3::ThreeLogDistancePropagationLossModel"));
+    lteHelper->SetPathlossModelAttribute("Distance1", DoubleValue(250));
+    lteHelper->SetPathlossModelAttribute("Distance2", DoubleValue(1000));
+    lteHelper->SetPathlossModelAttribute("Exponent1" ,DoubleValue(2));
+    lteHelper->SetPathlossModelAttribute("Exponent2" ,DoubleValue(2.5)); 
+    lteHelper->SetPathlossModelAttribute("ReferenceLoss" ,DoubleValue(46));
+    
 
     lteHelper->SetFadingModel("ns3::TraceFadingLossModel");
     std::ifstream ifTraceFile;
@@ -169,13 +187,19 @@ int main (int argc, char *argv[])
     }
     lteHelper->SetFadingModelAttribute ("TraceLength", TimeValue (Seconds (40.0)));
     lteHelper->SetFadingModelAttribute ("SamplesNum", UintegerValue (1000000));
-    lteHelper->SetFadingModelAttribute ("WindowSize", TimeValue (Seconds (5)));
+    lteHelper->SetFadingModelAttribute ("WindowSize", TimeValue (Seconds (1)));
    
-
-
+  
 
   NetDeviceContainer enbDevs = lteHelper->InstallEnbDevice (enbNodes);
   NetDeviceContainer ueDevs = lteHelper->InstallUeDevice (ueNodes);
+
+    Ptr<LteEnbNetDevice> lteEnbDev = enbDevs.Get(0)->GetObject<LteEnbNetDevice>();    
+    lteEnbDev->GetPhy()->SetTxPower(46);
+    // Set transmission power of the Ue to 23 dBm.
+  Ptr<LteUeNetDevice> lteUeDev = ueDevs.Get(0)->GetObject<LteUeNetDevice>();
+    lteUeDev->GetPhy()->SetTxPower(23);
+
 
   // Install the IP stack on the UEs
   internet.Install (ueNodes);
