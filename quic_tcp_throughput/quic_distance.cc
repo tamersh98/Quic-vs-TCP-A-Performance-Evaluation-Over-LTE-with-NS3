@@ -62,11 +62,10 @@ int main (int argc, char *argv[])
   // Parse command line attribute
 
   Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue(512*1024));
-  //Config::SetDefault ("ns3::LteEnbPhy::TxPower", DoubleValue (46.0));
- // Config::SetDefault ("ns3::LteUePhy::TxPower", DoubleValue (23.0));
 
-  Config::SetDefault ("ns3::LteEnbNetDevice::DlBandwidth", UintegerValue(100));
-  Config::SetDefault ("ns3::LteEnbNetDevice::UlBandwidth", UintegerValue(100));
+
+  //Config::SetDefault ("ns3::LteEnbNetDevice::DlBandwidth", UintegerValue(100));
+  //Config::SetDefault ("ns3::LteEnbNetDevice::UlBandwidth", UintegerValue(100));
 
   
    Ptr<RateErrorModel> em = CreateObject<RateErrorModel>();
@@ -146,7 +145,18 @@ int main (int argc, char *argv[])
 	mobility.Install (allNodes);
 
   GetPositionRaw(ueNodes.Get(0));
-  
+   lteHelper->SetPathlossModelType(TypeId::LookupByName("ns3::ThreeLogDistancePropagationLossModel"));
+    //lteHelper->SetPathlossModelAttribute("Frequency", DoubleValue(2.6e9));
+    //lteHelper->SetPathlossModelAttribute("SystemLoss", DoubleValue(1.0));
+    //lteHelper->SetPathlossModelAttribute("ShadowingStd", DoubleValue(8.0));
+    //lteHelper->SetPathlossModelAttribute("ShadowingMean", DoubleValue(0.0));
+    //lteHelper->SetPathlossModelAttribute("ReferenceLoss", DoubleValue(0.0));
+    //lteHelper->SetPathlossModelAttribute("ReferenceDistance", DoubleValue(1.0));
+    lteHelper->SetPathlossModelAttribute("Distance1", DoubleValue(250));
+    lteHelper->SetPathlossModelAttribute("Distance2", DoubleValue(1000));
+    lteHelper->SetPathlossModelAttribute("Exponent1" ,DoubleValue(2));
+    lteHelper->SetPathlossModelAttribute("Exponent2" ,DoubleValue(2.5));
+     lteHelper->SetPathlossModelAttribute("ReferenceLoss" ,DoubleValue(46));
    // lteHelper->SetPathlossModelAttribute("Exponent0" ,DoubleValue(1.2));
 
     lteHelper->SetFadingModel("ns3::TraceFadingLossModel");
@@ -169,13 +179,21 @@ int main (int argc, char *argv[])
     }
     lteHelper->SetFadingModelAttribute ("TraceLength", TimeValue (Seconds (40.0)));
     lteHelper->SetFadingModelAttribute ("SamplesNum", UintegerValue (1000000));
-    lteHelper->SetFadingModelAttribute ("WindowSize", TimeValue (Seconds (5)));
+    lteHelper->SetFadingModelAttribute ("WindowSize", TimeValue (Seconds (1)));
    
 
 
 
   NetDeviceContainer enbDevs = lteHelper->InstallEnbDevice (enbNodes);
   NetDeviceContainer ueDevs = lteHelper->InstallUeDevice (ueNodes);
+
+      // Set transmission power of the eNb to 46 dBm.
+  Ptr<LteEnbNetDevice> lteEnbDev = enbDevs.Get(0)->GetObject<LteEnbNetDevice>();    
+    lteEnbDev->GetPhy()->SetTxPower(46);
+
+    // Set transmission power of the Ue to 23 dBm.
+  Ptr<LteUeNetDevice> lteUeDev = ueDevs.Get(0)->GetObject<LteUeNetDevice>();
+    lteUeDev->GetPhy()->SetTxPower(23);
 
   // Install the IP stack on the UEs
   internet.InstallQuic (ueNodes);
