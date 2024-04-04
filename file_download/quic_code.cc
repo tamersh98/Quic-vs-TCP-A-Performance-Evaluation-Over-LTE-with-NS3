@@ -66,7 +66,7 @@ int main (int argc, char *argv[])
 
   // Parse command line attribute
 
-  Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue(512*1024));
+  Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue(512*1024*10));
 
 
   //Config::SetDefault ("ns3::LteEnbNetDevice::DlBandwidth", UintegerValue(100));
